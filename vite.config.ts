@@ -13,7 +13,9 @@ export default defineConfig({
   },
   preview: {
     port: parseInt(process.env.PORT || "4173"),
-    host: "0.0.0.0"
+    host: "0.0.0.0",
+    allowedHosts: ['inventory-stock-front-production.up.railway.app'],
+
   },
   build: {
     outDir: 'dist',
