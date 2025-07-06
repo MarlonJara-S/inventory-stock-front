@@ -1,6 +1,6 @@
-version: 2
-build:
-  commands:
-    - npm ci
-    - npm run build:railway
-  publishPath: dist
+[build]
+command = "npm ci && npm run build"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/"
