@@ -8,6 +8,7 @@ import {
   Settings,
   Bell,
   User,
+  LogOut,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -34,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button, Badge, AppBreadcrumb, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, ModeToggle } from '@/components';
+import { useAuth, useLogout, useAuthTokens } from '../../app/modules/auth/hooks';
 
 // Datos de navegación
 const data = {
@@ -77,6 +79,26 @@ function AppSidebar() {
   const location = useLocation();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
+  
+  // Hooks de autenticación
+  const { user } = useAuth();
+  const tokens = useAuthTokens();
+  const logoutMutation = useLogout();
+
+  const handleLogout = () => {
+    if (tokens?.refresh) {
+      logoutMutation.mutate(tokens.refresh);
+    }
+  };
+
+  // Datos de usuario para mostrar
+  const displayName = user?.first_name && user?.last_name 
+    ? `${user.first_name} ${user.last_name}`
+    : user?.username || 'Usuario';
+
+  const initials = user?.first_name && user?.last_name
+    ? `${user.first_name[0]}${user.last_name[0]}`
+    : user?.username?.slice(0, 2) || 'U';
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -238,11 +260,13 @@ function AppSidebar() {
                       <DropdownMenuLabel className="p-0 font-normal">
                         <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                            <User className="size-4" />
+                            <span className="text-xs font-medium uppercase">
+                              {initials}
+                            </span>
                           </div>
                           <div className="grid flex-1 text-left text-sm leading-tight">
-                            <span className="truncate font-semibold">Usuario</span>
-                            <span className="truncate text-xs">usuario@email.com</span>
+                            <span className="truncate font-semibold">{displayName}</span>
+                            <span className="truncate text-xs">{user?.email || 'usuario@email.com'}</span>
                           </div>
                         </div>
                       </DropdownMenuLabel>
@@ -251,8 +275,12 @@ function AppSidebar() {
                         <Settings />
                         Configuración
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        Cerrar Sesión
+                      <DropdownMenuItem 
+                        onClick={handleLogout}
+                        disabled={logoutMutation.isPending}
+                      >
+                        <LogOut />
+                        {logoutMutation.isPending ? 'Cerrando sesión...' : 'Cerrar Sesión'}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -269,11 +297,13 @@ function AppSidebar() {
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                   >
                     <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                      <User className="size-4" />
+                      <span className="text-xs font-medium uppercase">
+                        {initials}
+                      </span>
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">Usuario</span>
-                      <span className="truncate text-xs">usuario@email.com</span>
+                      <span className="truncate font-semibold">{displayName}</span>
+                      <span className="truncate text-xs">{user?.email || 'usuario@email.com'}</span>
                     </div>
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
@@ -286,11 +316,13 @@ function AppSidebar() {
                   <DropdownMenuLabel className="p-0 font-normal">
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                       <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                        <User className="size-4" />
+                        <span className="text-xs font-medium uppercase">
+                          {initials}
+                        </span>
                       </div>
                       <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">Usuario</span>
-                        <span className="truncate text-xs">usuario@email.com</span>
+                        <span className="truncate font-semibold">{displayName}</span>
+                        <span className="truncate text-xs">{user?.email || 'usuario@email.com'}</span>
                       </div>
                     </div>
                   </DropdownMenuLabel>
@@ -299,8 +331,12 @@ function AppSidebar() {
                     <Settings />
                     Configuración
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    Cerrar Sesión
+                  <DropdownMenuItem 
+                    onClick={handleLogout}
+                    disabled={logoutMutation.isPending}
+                  >
+                    <LogOut />
+                    {logoutMutation.isPending ? 'Cerrando sesión...' : 'Cerrar Sesión'}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
